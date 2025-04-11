@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tool chuyển link Shopee sang JS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+    h1 { color: #ee4d2d; }
+    input, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      margin-top: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    textarea { resize: vertical; height: 200px; }
+    button {
+      background-color: #ee4d2d;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #d4371a;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔁 Chuyển link sản phẩm Shopee thành mã JavaScript</h1>
+
+  <label>🔗 Link sản phẩm Shopee:</label>
+  <input type="text" id="shopeeLink" placeholder="https://shopee.vn/product/SHOPID/ITEMID/..." />
+
+  <label>🛒 Số lượng sản phẩm (mặc định: 1):</label>
+  <input type="number" id="qty" value="1" min="1" />
+
+  <button onclick="taoMa()">Tạo mã JavaScript</button>
+
+  <h3>📜 Kết quả:</h3>
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    function taoMa() {
+      const link = document.getElementById("shopeeLink").value.trim();
+      const qty = document.getElementById("qty").value.trim() || '1';
+      const output = document.getElementById("output");
+
+      const match = link.match(/product\/(\d+)\/(\d+)/);
+      if (!match) {
+        output.value = "❌ Không tìm được shopID và itemID từ link!";
+        return;
+      }
+
+      const shopID = match[1];
+      const itemID = match[2];
+
+      const script = `
+fetch('https://dquan2910.github.io/shopeebuynow/script.js')
+  .then(res => res.text())
+  .then(script => {
+    var final = script
+      .replace('itemIDTemp', '${itemID}')
+      .replace('shopIDTemp', '${shopID}')
+      .replace('qtyTemp', '${qty}');
+    
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.text = final;
+    document.head.appendChild(s);
+  });
+      `.trim();
+
+      output.value = script;
+    }
+  </script>
+
+</body>
+</html>
